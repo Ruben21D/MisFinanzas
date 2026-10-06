@@ -6,7 +6,7 @@
   <title>Mi Bóveda y Libertad Financiera</title>
   <style>
     body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 12px; background-color: #1a1c1e; color: #e2e2e4; text-align: center; }
-    .container { max-width: 480px; margin: auto; background: #222428; padding: 20px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.5); border-top: 6px solid #27ae60; }
+    .container { max-width: 480px; margin: auto; background: #222428; padding: 20px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.5); border-top: 6px solid #27ae60; position: relative; }
     .tabs-fin { display: flex; background: #2a2d32; padding: 4px; border-radius: 8px; margin-bottom: 15px; gap: 4px; }
     .tab-btn { flex: 1; padding: 12px 5px; border: none; background: none; font-size: 12px; font-weight: bold; color: #a0a5aa; cursor: pointer; border-radius: 6px; }
     .tab-btn.active { background: #27ae60; color: white; }
@@ -17,16 +17,19 @@
     .saldo-box { background: #1a1c1e; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px solid #27ae60; }
     .cal-box { background: #1a1c1e; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px solid #e67e22; display: none; }
     label { display: block; margin: 10px 0 4px; font-size: 13px; font-weight: 600; color: #cbd5e1; }
-    input, select { width: 100%; padding: 11px; border: 1px solid #40444b; background: #1a1c1e; color: white; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+    input, select { width: 100%; padding: 11px; border: 1px solid #40444b; background: #1a1c1e; color: white; border-radius: 6px; box-sizing: border-box; font-size: 14px; margin-bottom: 5px; }
+    textarea { width: 100%; padding: 11px; border: 1px solid #40444b; background: #1a1c1e; color: white; border-radius: 6px; box-sizing: border-box; font-size: 14px; height: 60px; resize: none; }
     button.save-btn { width: 100%; padding: 14px; background-color: #27ae60; color: white; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 12px; }
+    #status-box { text-align: center; padding: 10px; border-radius: 6px; font-weight: bold; display: none; margin-bottom: 12px; background: #2e7d32; color: white; }
     .reporte-output { background: #141517; padding: 12px; border-radius: 6px; font-family: monospace; white-space: pre-wrap; font-size: 12px; color: #e2e2e4; margin-top: 12px; border-left: 4px solid #27ae60; display: none; }
   </style>
 </head>
 <body>
 
   <div class="container" id="main-container">
-    <h2 id="main-title">🪙 Mi Bóveda Personal</h2>
-    
+    <h2>🪙 Mi Bóveda Personal</h2>
+    <div id="status-box"></div>
+
     <div class="tabs-fin">
       <button class="tab-btn active" id="t-caja" onclick="cambiarSeccionFin('caja')">💵 Caja Chica</button>
       <button class="tab-btn" id="t-deuda" onclick="cambiarSeccionFin('deuda')">🌋 Bola Nieve</button>
@@ -35,17 +38,35 @@
     <!-- SECCIÓN 1: CONTROL DE INGRESOS Y EGRESOS -->
     <div id="sec-caja" class="card-fin active">
       <div class="saldo-box">
-        <div style="font-size:11px; color:#9ca3af; font-weight:600;">💰 SALDO LIQUIDO DISPONIBLE</div>
+        <div style="font-size:11px; color:#9ca3af; font-weight:600;">💰 SALDO LÍQUIDO DISPONIBLE REAL</div>
         <div style="font-size:26px; font-weight:bold; color:#2ecc71;" id="num-saldo">Bs. 0.00</div>
       </div>
       
-      <div class="titulo-card">➕ Registrar Movimiento Diario</div>
-      <label>Tipo:</label>
-      <select id="caja-tipo" onchange="document.getElementById('main-container').style.borderTopColor=this.value==='EGRESO'?'#c0392b':'#27ae60'"><option value="INGRESO">INGRESO (Cosecha/Trabajos)</option><option value="EGRESO">EGRESO (Gastos/Pagos)</option></select>
-      <label>Concepto:</label> <input type="text" id="caja-con" placeholder="Ej. Pago por consultoría técnica">
-      <label>Categoría Discriminatoria:</label> <input type="text" id="caja-cat" placeholder="Ej. Transporte, Servicios, Alimentación">
-      <label>Monto (Bs.):</label> <input type="number" id="caja-mon" placeholder="0.00" step="0.01">
-      <label>Método:</label> <select id="caja-met"><option value="EFECTIVO">Efectivo</option><option value="TRANSFERENCIA">Transferencia</option><option value="QR">QR</option></select>
+      <div class="titulo-card">➕ Registrar Transacción Diaria</div>
+      <label>Tipo de Movimiento:</label>
+      <select id="caja-tipo" onchange="document.getElementById('main-container').style.borderTopColor=this.value==='EGRESO'?'#c0392b':'#27ae60'">
+        <option value="INGRESO">INGRESO (Producto o Servicio / Trabajos)</option>
+        <option value="EGRESO">EGRESO (Gastos / Pagos / Compras)</option>
+      </select>
+      
+      <label>Concepto / Detalle:</label> 
+      <input type="text" id="caja-con" placeholder="Ej. Pago consultoría técnica o Compra Repuestos">
+      
+      <label>Categoría Discriminatoria (Para Balance de Fin de Año):</label> 
+      <input type="text" id="caja-cat" placeholder="Ej. Transporte, Servicios, Alimentación, Honorarios">
+      
+      <label>Monto Económico (Bs.):</label> 
+      <input type="number" id="caja-mon" placeholder="0.00" step="0.01">
+      
+      <!-- 🏦 SINTONIZACIÓN CIVIL DE TUS 3 BANCOS DE BOLIVIA -->
+      <label>Cuenta o Método Utilizado:</label> 
+      <select id="caja-met">
+        <option value="EFECTIVO">💵 Efectivo (Billetera Física)</option>
+        <option value="BANCO_GANADERO">🏦 Banco Ganadero (Caja Ahorro)</option>
+        <option value="BANCO_BNB">🏦 Banco Nacional de Bolivia (BNB)</option>
+        <option value="BANCO_MERCANTIL">🏦 Banco Mercantil Santa Cruz</option>
+      </select>
+      
       <button class="save-btn" onclick="ejecutarAsientoCaja()">Asentar en Cuenta 🪙</button>
       
       <button class="save-btn" style="background:#2980b9; margin-top:8px;" onclick="emitirBalanceCategorias()">📊 Ver Rendimiento de Servicios</button>
@@ -55,29 +76,35 @@
     <!-- SECCIÓN 2: ESTRATEGIA BOLA DE NIEVE -->
     <div id="sec-deuda" class="card-fin">
       <div class="cal-box" id="panel-calendario">
-        <div style="font-size:11px; color:#e2e2e4; font-weight:600;">🗓️ FECHA DE LIBERACIÓN ABSOLUTA</div>
-        <div style="font-size:24px; font-weight:bold; color:#e67e22;" id="num-fecha-liberacion">NOVIEMBRE 2026</div>
-        <div style="font-size:11px; color:#9ca3af; margin-top:4px;" id="num-meses-cuenta">Calculando meses...</div>
+        <div style="font-size:11px; color:#e2e2e4; font-weight:600;">🗓️ FECHA DE LIBERACIÓN ABSOLUTA EN CALENDARIO</div>
+        <div style="font-size:24px; font-weight:bold; color:#e67e22;" id="num-fecha-liberacion">CALCULANDO...</div>
+        <div style="font-size:11px; color:#9ca3af; margin-top:4px;" id="num-meses-cuenta">Te tomará exactamente 0 meses quedar libre de deudas.</div>
       </div>
 
       <div class="titulo-card" style="color:#e67e22; border-bottom-color:#e67e22;">🛑 Indexar Nueva Deuda Pasiva</div>
-      <label>Nombre de la Deuda:</label> <input type="text" id="deuda-nom" placeholder="Ej. Tarjeta de Crédito / Préstamo">
+      <label>Nombre de la Deuda:</label> <input type="text" id="deuda-nom" placeholder="Ej. Tarjeta de Crédito o Préstamo Personal">
       <label>Monto Total Pendiente (Bs.):</label> <input type="number" id="deuda-tot" placeholder="0.00">
       <label>Pago Mínimo Mensual (Bs.):</label> <input type="number" id="deuda-min" placeholder="0.00">
+      <label>Notas Adicionales (Opcional):</label> <textarea id="deuda-notas" placeholder="Ej. Préstamo familiar sin intereses..."></textarea>
       <button class="save-btn" style="background:#e67e22;" onclick="ejecutarAsientoDeuda()">Sellar Deuda en Historial 🔒</button>
       
       <div style="border-top:1px dashed #40444b; margin-top:20px; padding-top:15px;">
         <div class="titulo-card" style="color:#e67e22; border-bottom-color:#e67e22;">⚡ Inyectar Fuerza Cascada</div>
         <label>Inyectar Capital Extra Mensual (Bs.):</label>
-        <input type="number" id="bola-extra" value="0" placeholder="Monto extra que puedas sumar hoy">
+        <input type="number" id="bola-extra" value="0" placeholder="Monto extra que puedas sumar este mes">
         <button class="save-btn" style="background:#d35400;" onclick="ejecutarSimulacionCascada()">🌋 Activar Efecto Bola de Nieve</button>
       </div>
       <div id="out-deuda" class="reporte-output" style="border-left-color:#e67e22;"></div>
     </div>
   </div>
   <script>
-    // URL PROVISTA POR TU CUENTA DE GOOGLE APPS SCRIPT PERSONAL
+    // 🔒 TRANSMISIÓN BLINDADA ANTI-CORS (Mecanismo unificado e infalible)
+    // REEMPLAZA ÚNICAMENTE ESTA LÍNEA CON LA URL DE APPS SCRIPT QUE COPIASTE DE TU CUENTA PERSONAL
     const WEB_APP_URL_FINANZAS = "https://script.google.com/macros/s/AKfycbxbx9psIIOzajg0MjPBFqGmIXMK0MT1iX9RQ6N3zEoXwwzEDWnuv4O6iBobqEPn6BL7/exec";
+    
+    var globalRegistros = [];
+    var pAsistente = "";
+    var pStaff = "";
 
     function cambiarSeccionFin(id) {
       var clasesSec = document.getElementsByClassName("card-fin");
@@ -89,14 +116,14 @@
       var btn = document.getElementById("t-"+id);
       btn.className = "tab-btn active" + (id==="deuda"?" deuda-mode":"");
       
-      document.getElementById("main-title").innerText = id==="caja" ? "🪙 Mi Bóveda Personal" : "🌋 Estrategia Bola de Nieve";
+      var titulo = id==="caja" ? "🪙 Mi Bóveda Personal" : "🌋 Estrategia Bola de Nieve";
       document.getElementById("main-container").style.borderTopColor = id==="caja"?"#27ae60":"#e67e22";
     }
 
     function refrescarSaldoInicial() {
       fetch(WEB_APP_URL_FINANZAS)
-        .then(res => res.json())
-        .then(data => {
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
           if (data && data.hasOwnProperty("saldoDisponible")) {
             document.getElementById("num-saldo").innerText = "Bs. " + data.saldoDisponible.toFixed(2);
           }
@@ -107,14 +134,29 @@
       var con = document.getElementById("caja-con").value;
       var cat = document.getElementById("caja-cat").value;
       var mon = document.getElementById("caja-mon").value;
-      if (!con.trim() || !cat.trim() || !mon) { alert("Completa los datos."); return; }
+      if (!con.trim() || !cat.trim() || !mon) { alert("Por favor, completa el concepto, la categoría y el monto."); return; }
       
-      var datos = { target_sheet: "Flujo_Caja", tipo: document.getElementById("caja-tipo").value, concepto: con, categoria: cat, monto: mon, metodo: document.getElementById("caja-met").value };
+      var datos = { 
+        target_sheet: "Flujo_Caja", 
+        tipo: document.getElementById("caja-tipo").value, 
+        concepto: con, 
+        categoria: cat, 
+        monto: mon, 
+        metodo: document.getElementById("caja-met").value 
+      };
       
-      fetch(WEB_APP_URL_FINANZAS, { method: "POST", mode: "no-cors", body: JSON.stringify(datos) })
+      avisarEstado("Sincronizando flujo con tu Bóveda personal...");
+
+      fetch(WEB_APP_URL_FINANZAS, { 
+        method: "POST", 
+        mode: "no-cors", 
+        body: JSON.stringify(datos) 
+      })
       .then(function() {
-        alert("🪙 Transacción guardada.");
-        document.getElementById("caja-con").value=""; document.getElementById("caja-cat").value=""; document.getElementById("caja-mon").value="";
+        alert("🪙 Transacción guardada con éxito en tu Google Sheets.");
+        document.getElementById("caja-con").value=""; 
+        document.getElementById("caja-cat").value=""; 
+        document.getElementById("caja-mon").value="";
         refrescarSaldoInicial();
       });
     }
@@ -124,15 +166,15 @@
       out.style.display = "block"; out.innerText = "Abriendo bóveda y analizando prioridades...";
       
       fetch(WEB_APP_URL_FINANZAS)
-        .then(res => res.json())
-        .then(data => {
-          var r = "📊 *BALANCE DE COSECHA Y PRIORIDADES*\n----------------------------------\n";
-          r += "💰 *SALDO LÍQUIDO:* Bs. " + data.saldoDisponible.toFixed(2) + "\n";
-          r += "➕ *INGRESOS EN EL AÑO:* Bs. " + data.totalIngresos.toFixed(2) + "\n     _Por Servicios:_\n";
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var r = "📊 *BALANCE DE PRODUCTOS, SERVICIOS Y PRIORIDADES*\n----------------------------------\n";
+          r += "💰 *SALDO LÍQUIDO DISPONIBLE:* Bs. " + data.saldoDisponible.toFixed(2) + "\n\n";
+          r += "➕ *INGRESOS TOTALES:* Bs. " + data.totalIngresos.toFixed(2) + "\n   _Por Productos y Servicios:_\n";
           for (var ci in data.ingresosPorCategoria) r += "     ▪️ " + ci + ": Bs. " + data.ingresosPorCategoria[ci].toFixed(2) + "\n";
-          r += "\n📉 *EGRESOS EN EL AÑO:* Bs. " + data.totalEgresos.toFixed(2) + "\n     _Por Fugas/Gastos:_\n";
+          r += "\n📉 *EGRESOS TOTALES:* Bs. " + data.totalEgresos.toFixed(2) + "\n   _Por Categorías de Gasto:_\n";
           for (var ce in data.egresosPorCategoria) r += "     ▪️ " + ce + ": Bs. " + data.egresosPorCategoria[ce].toFixed(2) + "\n";
-          r += "----------------------------------\n🎯 *RITMO:* " + (data.saldoDisponible > 0 ? "Reteniendo capital con éxito." : "Ajustar prioridades de inmediato.");
+          r += "----------------------------------\n🎯 *RECOMENDACIÓN DE AHORRO:* " + (data.saldoDisponible > 0 ? "Felicidades. Estás reteniendo capital con éxito." : "Ajustar prioridades y frenar gastos de inmediato.");
           out.innerText = r;
         });
     }
@@ -141,35 +183,56 @@
       var nom = document.getElementById("deuda-nom").value;
       var tot = document.getElementById("deuda-tot").value;
       var min = document.getElementById("deuda-min").value;
-      if (!nom.trim() || !tot || !min) { alert("Completa los datos de la deuda."); return; }
+      var not = document.getElementById("deuda-notas").value;
+      if (!nom.trim() || !tot || !min) { alert("Por favor, completa los datos esenciales de la deuda."); return; }
       
-      var datos = { target_sheet: "Mis_Deudas", nombre: nom, total: tot, minimo: min };
+      var datos = { 
+        target_sheet: "Mis_Deudas", 
+        nombre: nom, 
+        total: tot, 
+        minimo: min,
+        notas: not
+      };
       
-      fetch(WEB_APP_URL_FINANZAS, { method: "POST", mode: "no-cors", body: JSON.stringify(datos) })
+      avisarEstado("Indexando deuda pasiva en el historial...");
+
+      fetch(WEB_APP_URL_FINANZAS, { 
+        method: "POST", 
+        mode: "no-cors", 
+        body: JSON.stringify(datos) 
+      })
       .then(function() {
-        alert("🛑 Deuda indexada.");
-        document.getElementById("deuda-nom").value=""; document.getElementById("deuda-tot").value=""; document.getElementById("deuda-min").value="";
+        alert("🛑 Deuda indexada correctamente en la pestaña Mis_Deudas.");
+        document.getElementById("deuda-nom").value=""; 
+        document.getElementById("deuda-tot").value=""; 
+        document.getElementById("deuda-min").value="";
+        document.getElementById("deuda-notas").value="";
       });
     }
 
-    // 🌋 EJECUCIÓN MATEMÁTICA DE CASCADA BOLA DE NIEVE DESDE EL DISPARADOR
     function ejecutarSimulacionCascada() {
       var extra = document.getElementById("bola-extra").value || 0;
       var out = document.getElementById("out-deuda");
-      out.style.display = "block"; out.innerText = "Ejecutando efecto bola de nieve en cascada...";
+      out.style.display = "block"; out.innerText = "Calculando efecto bola de nieve en cascada...";
       
       fetch(WEB_APP_URL_FINANZAS + "?tipo=boladenieve&extra=" + extra)
-        .then(res => res.json())
-        .then(data => {
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
           document.getElementById("panel-calendario").style.display = "block";
           document.getElementById("num-fecha-liberacion").innerText = data.fechaLiberacion;
           document.getElementById("num-meses-cuenta").innerText = "Te tomará exactamente " + data.mesesTotales + " meses quedar libre.";
           
-          out.innerText = "🌋 *CRONOGRAMA DE LIQUIDACIÓN CASCADA*\n" +
-                          "----------------------------------\n" +
+          out.innerText = "🌋 *CRONOGRAMA DE LIQUIDACIÓN CASCADA BOLA DE NIEVE*\n" +
+                          "--------------------------------------------------\n" +
                           "🚀 *FECHA DE LIBERACIÓN TOTAL:* " + data.fechaLiberacion + "\n\n" +
                           data.cronogramaDetallado;
         });
+    }
+
+    function avisarEstado(txt) {
+      var box = document.getElementById("status-box");
+      box.innerText = txt; box.className = "ok"; box.style.display = "block";
+      setTimeout(function() { box.style.display = "none"; }, 3500);
     }
 
     window.onload = refrescarSaldoInicial;
